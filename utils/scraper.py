@@ -10,8 +10,8 @@ os.makedirs(RAW_DIR, exist_ok=True)
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 
-def fetch_reviews(app_id: str, count: int) -> list:
-    result, _ = gp_reviews(app_id, count=count)
+def fetch_reviews(app_id: str, count: int, lang: str = 'pl', country: str = 'pl') -> list:
+    result, _ = gp_reviews(app_id, lang=lang, country=country, count=count)
     return result
 
 
@@ -38,9 +38,9 @@ def save_json(data: list, path: str) -> None:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 
-def run_scrape(app_name: str, app_id: str, count: int, only_negative: bool) -> tuple[list, str, str]:
+def run_scrape(app_name: str, app_id: str, count: int, only_negative: bool, lang: str = 'pl', country: str = 'pl') -> tuple[list, str, str]:
     """Fetch, preprocess, and persist reviews. Returns (processed, raw_path, processed_path)."""
-    raw = fetch_reviews(app_id, count)
+    raw = fetch_reviews(app_id, count, lang=lang, country=country)
     timestamp = datetime.now().strftime("%Y-%m-%d")
     raw_path = f"{RAW_DIR}/{app_name}_{timestamp}.json"
     save_json(raw, raw_path)

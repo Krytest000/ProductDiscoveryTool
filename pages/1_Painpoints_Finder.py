@@ -14,6 +14,16 @@ with st.form("scrape_form"):
     with col2:
         app_id = st.text_input("Google Play App ID", placeholder="e.g. com.revolut.revolut")
 
+    COUNTRIES = {
+        "Poland (pl)": ("pl", "pl"),
+        "United Kingdom (en)": ("en", "gb"),
+        "United States (en)": ("en", "us"),
+        "Germany (de)": ("de", "de"),
+        "France (fr)": ("fr", "fr"),
+    }
+    country_label = st.selectbox("Country / Language", options=list(COUNTRIES.keys()))
+    lang, country = COUNTRIES[country_label]
+
     count = st.number_input("Number of reviews to fetch", min_value=10, max_value=1000, value=100, step=10)
     only_negative = st.checkbox("Only negative reviews (≤3★)", value=True)
     run_ai = st.checkbox("Run AI pain point analysis", value=True)
@@ -27,7 +37,7 @@ if submitted:
     with st.spinner("Fetching reviews from Google Play..."):
         try:
             processed, raw_path, processed_path = run_scrape(
-                app_name.strip(), app_id.strip(), int(count), only_negative
+                app_name.strip(), app_id.strip(), int(count), only_negative, lang=lang, country=country
             )
         except Exception as e:
             st.error(f"Failed to fetch reviews: {e}")
