@@ -40,6 +40,8 @@ def save_json(data: list, path: str) -> None:
 
 def run_scrape(app_name: str, app_id: str, count: int, only_negative: bool, lang: str = 'pl', country: str = 'pl') -> tuple[list, str, str]:
     """Fetch, preprocess, and persist reviews. Returns (processed, raw_path, processed_path)."""
+    from utils.supabase_client import save_reviews
+
     raw = fetch_reviews(app_id, count, lang=lang, country=country)
     timestamp = datetime.now().strftime("%Y-%m-%d")
     raw_path = f"{RAW_DIR}/{app_name}_{timestamp}.json"
@@ -48,5 +50,11 @@ def run_scrape(app_name: str, app_id: str, count: int, only_negative: bool, lang
     processed = preprocess_reviews(raw, only_negative)
     processed_path = f"{PROCESSED_DIR}/{app_name}_{timestamp}_cleaned.json"
     save_json(processed, processed_path)
+
+    if processed:
+        try:
+            save_reviews(processed, app_name, app_id, timestamp)
+        except Exception as e:
+            print(f"Supabase save failed: {e}")
 
     return processed, raw_path, processed_path
